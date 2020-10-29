@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  mylar:
+    image: linuxserver/mylar:latest
+    container_name: mylar
+    hostname: mylar
+    restart: unless-stopped
+    volumes:
+      - ../Data/config:/config
+      - ../Data/comics:/comics
+      - ../Data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.mylar.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.mylar.entrypoints=web-secure"
+      - "traefik.http.routers.mylar.middlewares=default-headers@file"
+      - "traefik.http.routers.mylar.service=mylar"
+      - "traefik.http.routers.mylar.tls=true"
+      - "traefik.http.services.mylar.loadbalancer.server.port=8090" # Proxied Port
